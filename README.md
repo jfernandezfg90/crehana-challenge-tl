@@ -4,7 +4,7 @@ API REST para gestionar listas de tareas y tareas, desarrollada como desafio tec
 
 ## Tech Stack
 
-- **Python 3.11** + **FastAPI**
+- **Python 3.12+** + **FastAPI**
 - **SQLite** (local/Docker, zero config) / **PostgreSQL via Supabase** (produccion/Vercel)
 - **SQLAlchemy 2.x** sync — compatible con ambas bases de datos
 - **JWT** (python-jose + passlib/bcrypt)
