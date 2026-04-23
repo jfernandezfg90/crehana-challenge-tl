@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager · Iniciar sesión</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      padding: 24px;
+    }
+
+    /* Fondo decorativo */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 10%, rgba(72,34,244,.09) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 90%, rgba(72,34,244,.06) 0%, transparent 70%);
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 400px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .auth-header {
+      padding: 36px 40px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: linear-gradient(160deg, var(--brand-bg) 0%, #fff 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .auth-logo { height: 36px; object-fit: contain; }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--brand-muted);
+      border-radius: 8px;
+      padding: 3px;
+      width: 100%;
+    }
+    .auth-tab {
+      flex: 1;
+      height: 34px;
+      border-radius: 6px;
+      font-size: .8125rem;
+      font-weight: 500;
+      color: var(--text-2);
+      transition: var(--transition);
+    }
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--brand);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .auth-body { padding: 28px 40px 36px; }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .auth-form[hidden] { display: none; }
+
+    .auth-footer {
+      margin-top: 4px;
+      text-align: center;
+      font-size: .8125rem;
+      color: var(--text-3);
+    }
+
+    .error-msg {
+      display: none;
+      background: #fff0f0;
+      color: #c0392b;
+      border: 1px solid #ffd6d6;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: .8125rem;
+    }
+    .error-msg.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="auth-card">
+  <div class="auth-header">
+    <img src="/static/logo.png" alt="Logo" class="auth-logo"
+         onerror="this.style.display='none'; document.getElementById('auth-brand').style.display='flex'"/>
+    <div id="auth-brand" style="display:none; align-items:center; gap:10px;">
+      <img src="/static/isotipo.png" alt="Isotipo" style="height:28px;"
+           onerror="this.style.display='none'"/>
+      <span style="font-weight:700; font-size:1.1rem; color:var(--brand);">Task Manager</span>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="auth-tab" onclick="switchTab('register')">Registrarse</button>
+    </div>
+  </div>
+
+  <div class="auth-body">
+
+    <!-- LOGIN -->
+    <form class="auth-form" id="form-login" onsubmit="doLogin(event)">
+      <div id="login-error" class="error-msg"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="login-email"
+               placeholder="tu@email.com" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="login-password"
+               placeholder="••••••••" required autocomplete="current-password" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" id="btn-login">
+        <span id="login-label">Iniciar sesión</span>
+        <div class="spinner" id="login-spinner"></div>
+      </button>
+    </form>
+
+    <!-- REGISTER -->
+    <form class="auth-form" id="form-register" hidden onsubmit="doRegister(event)">
+      <div id="register-error" class="error-msg"></div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input type="text" class="form-input" id="reg-name"
+               placeholder="Tu nombre" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="reg-email"
+               placeholder="tu@email.com" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="reg-password"
+               placeholder="Mínimo 6 caracteres" required minlength="6"
+               autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" id="btn-register">
+        <span id="register-label">Crear cuenta</span>
+        <div class="spinner" id="register-spinner"></div>
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<script>
+const API = '';
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', isLogin ? i === 0 : i === 1)
+  );
+  document.getElementById('form-login').hidden = !isLogin;
+  document.getElementById('form-register').hidden = isLogin;
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('register-error').classList.remove('show');
+}
+
+function setLoading(btnId, spinnerId, labelId, loading) {
+  document.getElementById(btnId).disabled = loading;
+  document.getElementById(spinnerId).style.display = loading ? 'block' : 'none';
+  document.getElementById(labelId).style.opacity = loading ? '0' : '1';
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+  setLoading('btn-login', 'login-spinner', 'login-label', true);
+
+  try {
+    const res = await fetch(`${API}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('login-email').value.trim(),
+        password: document.getElementById('login-password').value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.detail || 'Credenciales incorrectas';
+      errEl.classList.add('show');
+      return;
+    }
+    localStorage.setItem('access_token', data.access_token);
+    window.location.href = '/dashboard';
+  } catch {
+    errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+    errEl.classList.add('show');
+  } finally {
+    setLoading('btn-login', 'login-spinner', 'login-label', false);
+  }
+}
+
+async function doRegister(e) {
+  e.preventDefault();
+  const errEl = document.getElementById('register-error');
+  errEl.classList.remove('show');
+  setLoading('btn-register', 'register-spinner', 'register-label', true);
+
+  try {
+    const res = await fetch(`${API}/api/v1/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('reg-email').value.trim(),
+        password: document.getElementById('reg-password').value,
+        name: document.getElementById('reg-name').value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.detail || 'No se pudo crear la cuenta';
+      errEl.classList.add('show');
+      return;
+    }
+    // Auto-login after register
+    const loginRes = await fetch(`${API}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('reg-email').value.trim(),
+        password: document.getElementById('reg-password').value,
+      }),
+    });
+    const loginData = await loginRes.json();
+    if (loginRes.ok) {
+      localStorage.setItem('access_token', loginData.access_token);
+      window.location.href = '/dashboard';
+    } else {
+      switchTab('login');
+    }
+  } catch {
+    errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+    errEl.classList.add('show');
+  } finally {
+    setLoading('btn-register', 'register-spinner', 'register-label', false);
+  }
+}
+
+// Redirect if already logged in
+if (localStorage.getItem('access_token')) {
+  window.location.href = '/dashboard';
+}
+</script>
+</body>
+</html>

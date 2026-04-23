@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# Tests & coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+.vercel
+.claude/
+.agents/
