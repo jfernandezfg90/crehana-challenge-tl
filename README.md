@@ -236,6 +236,15 @@ El dashboard ha sido diseñado para ser funcional y visualmente atractivo.
 - **`alembic/`**: Contiene las migraciones de la base de datos. Es vital para evolucionar el esquema de la base de datos en entornos de produccion (PostgreSQL) sin perdida de datos.
 - **`.flake8`**: Configuracion para el linter, asegurando que el estilo del codigo se mantenga consistente y compatible con formateadores como Black.
 
+## Próximos Pasos (Roadmap)
+
+Para escalar este MVP a una solución de producción robusta:
+
+- **Notificaciones Reales**: Integrar un proveedor real.
+- **Paginación y Filtros**: Optimizar los endpoints de listado para manejar grandes volúmenes de datos.
+- **Roles y Permisos (RBAC)**: Implementar niveles de acceso diferenciados (Administrador, Miembro, Lector).
+- **Dashboard de Administración**: Panel con métricas clave y vista global del estado de todas las tareas.
+
 ## Licencia
 
 Este proyecto fue desarrollado como prueba técnica y es de libre uso para fines educativos.
