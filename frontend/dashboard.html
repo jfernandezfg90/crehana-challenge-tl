@@ -523,16 +523,59 @@
     }
 
     @media (max-width: 600px) {
-      .sidebar {
-        display: none;
+      .navbar-brand {
+        display: none !important;
       }
 
-      .sidebar.mobile-open {
+      .sidebar {
         display: flex;
         position: fixed;
         inset: 0 auto 0 0;
-        z-index: 50;
+        z-index: 1100;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        width: 280px;
       }
+
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 999;
+        backdrop-filter: blur(2px);
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+
+      .btn-menu-mobile {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        font-size: 1.25rem;
+        cursor: pointer;
+        color: var(--text);
+      }
+
+      .btn-sidebar-close {
+        display: flex !important;
+      }
+    }
+
+    .btn-menu-mobile, .btn-sidebar-close {
+      display: none;
     }
   </style>
 </head>
@@ -541,6 +584,7 @@
 
   <!-- NAVBAR -->
   <nav class="navbar">
+    <button class="btn-menu-mobile" onclick="toggleSidebar()">☰</button>
     <img src="/static/logo.png" alt="Logo" class="navbar-logo"
       onerror="this.style.display='none'; document.getElementById('nav-brand').style.display='flex'" />
     <div id="nav-brand" class="navbar-brand" style="display:none">
@@ -560,14 +604,20 @@
   <!-- BODY -->
   <div class="app-body">
 
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <span class="sidebar-title">Mis Listas</span>
-        <button class="btn btn-primary" style="height:30px;padding:0 10px;font-size:.8125rem"
-          onclick="openModal('modal-new-list')">
-          + Nueva
-        </button>
+        <div style="display: flex; gap: 4px;">
+          <button class="btn btn-primary" style="height:30px;padding:0 10px;font-size:.8125rem"
+            onclick="openModal('modal-new-list')">
+            + Nueva
+          </button>
+          <button class="btn btn-ghost btn-sidebar-close" style="height:30px; width:30px; padding:0;" onclick="toggleSidebar()">✕</button>
+        </div>
       </div>
       <div class="sidebar-lists" id="sidebar-lists">
         <div class="sidebar-empty">Cargando listas...</div>
@@ -844,6 +894,12 @@
 
     /* ─── Modal ─────────────────────────────── */
     function openModal(id) {
+      // Cerrar sidebar si está abierto (en móvil)
+      if (window.innerWidth <= 600) {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+        document.getElementById('sidebar-overlay').classList.remove('active');
+      }
+      
       document.getElementById(id).classList.add('open');
       const inp = document.querySelector(`#${id} input, #${id} textarea`);
       if (inp) setTimeout(() => inp.focus(), 60);
@@ -865,6 +921,12 @@
     let currentUserEmail = null;
     let editingTaskId = null;
     let editingListId = null;
+
+    /* ─── Responsive ────────────────────────── */
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('mobile-open');
+      document.getElementById('sidebar-overlay').classList.toggle('active');
+    }
 
     /* ─── User profile ──────────────────────── */
     function initUser() {
@@ -956,6 +1018,12 @@
       document.getElementById('filter-priority').value = '';
       renderSidebar();
       loadTasks();
+
+      // Cerrar sidebar en móvil tras seleccionar
+      if (window.innerWidth <= 600) {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+        document.getElementById('sidebar-overlay').classList.remove('active');
+      }
     }
 
     /* ─── Edit list ─────────────────────────── */
